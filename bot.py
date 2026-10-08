@@ -1,5 +1,17 @@
 import os
 from dotenv import load_dotenv
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+class FakeHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running!")
+def run_fake_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(('0.0.0.0', port), FakeHandler)
+    server.serve_forever()
+threading.Thread(target=run_fake_server, daemon=True).start()
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from voix import faire_voix
